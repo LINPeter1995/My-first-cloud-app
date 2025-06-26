@@ -1,3 +1,5 @@
+name: Terraform Deploy
+
 on:
   push:
     branches:
@@ -12,19 +14,21 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout Code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials
+      - name: 🔐 Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::129271359144:role/GitHubTerraformDeployRole
           aws-region: ap-northeast-1
 
-      - name: Install Terraform
+      - name: 🧰 Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
 
-      - name: Run Terraform Deploy Script
+      - name: 🏗️ Run Terraform Deploy Script
         run: bash scripts/deploy.sh
+
+

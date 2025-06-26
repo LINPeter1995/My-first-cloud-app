@@ -3,6 +3,9 @@ set -e
 
 echo "🏗️ 部署開始..."
 
+# 切換到 Terraform 專案目錄
+cd terraform
+
 # 初始化 Terraform
 terraform init
 
@@ -16,4 +19,5 @@ terraform plan
 terraform apply -auto-approve
 
 echo "✅ 部署完成"
+
 
