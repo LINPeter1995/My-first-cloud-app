@@ -6,10 +6,6 @@ terraform {
     }
   }
 
-provider "aws" {
-  region = "ap-northeast-1"
-}
-
   backend "s3" {
     bucket  = "my-terraform-state-linpeter1995"
     key     = "terraform.tfstate"
@@ -17,6 +13,11 @@ provider "aws" {
     encrypt = true
   }
 }
+
+provider "aws" {
+  region = "ap-northeast-1"
+}
+
 
 resource "random_id" "suffix" {
   byte_length = 4
