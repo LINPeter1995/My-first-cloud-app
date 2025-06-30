@@ -76,9 +76,6 @@ module "eks" {
 
   vpc_id = module.vpc.vpc_id
 
-  # 這裡改用 public_subnets 指定叢集的公有子網
-  public_subnets = module.vpc.public_subnets
-
   eks_managed_node_groups = {
     default = {
       desired_size   = 1
@@ -86,12 +83,7 @@ module "eks" {
       min_size       = 1
       instance_types = ["t3.medium"]
 
-      # node group 指定使用的子網 ID
       subnet_ids = module.vpc.public_subnets
     }
   }
 }
-
-
-
-
