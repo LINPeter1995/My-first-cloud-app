@@ -6,16 +6,16 @@ terraform {
     }
   }
 
+provider "aws" {
+  region = "ap-northeast-1"
+}
+
   backend "s3" {
     bucket  = "my-terraform-state-linpeter1995"
     key     = "terraform.tfstate"
     region  = "ap-northeast-1"
     encrypt = true
   }
-}
-
-provider "aws" {
-  region = "ap-northeast-1"
 }
 
 resource "random_id" "suffix" {
