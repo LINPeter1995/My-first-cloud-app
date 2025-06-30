@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = ">= 5.95, < 6.0.0"
     }
   }
 
@@ -13,6 +13,7 @@ terraform {
     encrypt        = true
   }
 }
+
 
 provider "aws" {
   region = "ap-northeast-1"
