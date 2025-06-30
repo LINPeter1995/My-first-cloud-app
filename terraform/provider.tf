@@ -2,9 +2,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.33, < 7.0"
+      version = "~> 5.39.0" # 安全版本，與 module 兼容
     }
   }
+}
+
 
   backend "s3" {
     bucket  = "my-terraform-state-linpeter1995"
@@ -46,7 +48,7 @@ resource "aws_db_instance" "postgres" {
   engine               = "postgres"
   engine_version       = "15.4"
   instance_class       = "db.t3.micro"
-  name                 = local.rds_secret.dbname
+  db_name              = local.rds_secret.dbname
   username             = local.rds_secret.username
   password             = local.rds_secret.password
   parameter_group_name = "default.postgres17"
