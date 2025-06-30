@@ -2,11 +2,9 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.39.0" # 安全版本，與 module 兼容
+      version = "~> 5.39.0"
     }
   }
-}
-
 
   backend "s3" {
     bucket  = "my-terraform-state-linpeter1995"
@@ -19,7 +17,6 @@ terraform {
 provider "aws" {
   region = "ap-northeast-1"
 }
-
 
 resource "random_id" "suffix" {
   byte_length = 4
@@ -34,7 +31,7 @@ resource "aws_s3_bucket" "static_assets" {
   force_destroy = true
 }
 
-# 從 Secrets Manager 讀取 RDS 機密
+# 讀取 RDS 密碼
 data "aws_secretsmanager_secret_version" "rds_secret" {
   secret_id = "My-first-cloud-app_RDS_Postgres"
 }
@@ -51,13 +48,13 @@ resource "aws_db_instance" "postgres" {
   db_name              = local.rds_secret.dbname
   username             = local.rds_secret.username
   password             = local.rds_secret.password
-  parameter_group_name = "default.postgres17"
+  parameter_group_name = "default.postgres15"
   skip_final_snapshot  = true
 }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.1.1" # 或任何你想用的版本，例如 6.0.1
+  version = "5.1.1"
 
   name                 = "my-vpc"
   cidr                 = "10.0.0.0/16"
@@ -66,18 +63,15 @@ module "vpc" {
   enable_dns_hostnames = true
 }
 
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "20.32.0"
 
-  cluster_name    = "my-eks-cluster"
-  cluster_version = "1.29"
-
+  cluster_name                    = "my-eks-cluster"
+  cluster_version                 = "1.29"
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
-
-  vpc_id = module.vpc.vpc_id
+  vpc_id                          = module.vpc.vpc_id
 
   eks_managed_node_groups = {
     default = {
@@ -85,8 +79,7 @@ module "eks" {
       max_size       = 2
       min_size       = 1
       instance_types = ["t3.medium"]
-
-      subnet_ids = module.vpc.public_subnets
+      subnet_ids     = module.vpc.public_subnets
     }
   }
 }
