@@ -71,11 +71,13 @@ module "eks" {
   cluster_name    = "my-eks-cluster"
   cluster_version = "1.29"
 
-  endpoint_private_access = true
-  endpoint_public_access  = true
+  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = true
 
-  vpc_id  = module.vpc.vpc_id
-  subnets = module.vpc.public_subnets
+  vpc_id = module.vpc.vpc_id
+
+  # 這裡改用 public_subnets 指定叢集的公有子網
+  public_subnets = module.vpc.public_subnets
 
   eks_managed_node_groups = {
     default = {
@@ -83,9 +85,13 @@ module "eks" {
       max_size       = 2
       min_size       = 1
       instance_types = ["t3.medium"]
+
+      # node group 指定使用的子網 ID
+      subnet_ids = module.vpc.public_subnets
     }
   }
 }
+
 
 
 
