@@ -55,7 +55,7 @@ resource "aws_db_instance" "postgres" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "6.0.1"
+  version = "5.1.1" # 或任何你想用的版本，例如 6.0.1
 
   name                 = "my-vpc"
   cidr                 = "10.0.0.0/16"
@@ -63,6 +63,7 @@ module "vpc" {
   public_subnets       = ["10.0.1.0/24", "10.0.2.0/24"]
   enable_dns_hostnames = true
 }
+
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
