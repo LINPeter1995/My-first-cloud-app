@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.33, < 6.0.0"
+      version = ">= 4.33, < 7.0"
     }
   }
 
@@ -66,7 +66,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.37.1"
+  version = "20.32.0"
 
   cluster_name    = "my-eks-cluster"
   cluster_version = "1.29"
@@ -86,5 +86,6 @@ module "eks" {
     }
   }
 }
+
 
 
