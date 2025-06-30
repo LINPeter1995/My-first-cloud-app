@@ -31,6 +31,7 @@ resource "aws_s3_bucket" "static_assets" {
   force_destroy = true
 }
 
+# 從 Secrets Manager 讀取 RDS 機密
 data "aws_secretsmanager_secret_version" "rds_secret" {
   secret_id = "My-first-cloud-app_RDS_Postgres"
 }
@@ -55,38 +56,34 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "6.0.1"
 
-  config = {
-    name                 = "my-vpc"
-    cidr                 = "10.0.0.0/16"
-    azs                  = ["ap-northeast-1a", "ap-northeast-1c"]
-    public_subnets       = ["10.0.1.0/24", "10.0.2.0/24"]
-    enable_dns_hostnames = true
-  }
+  name                 = "my-vpc"
+  cidr                 = "10.0.0.0/16"
+  azs                  = ["ap-northeast-1a", "ap-northeast-1c"]
+  public_subnets       = ["10.0.1.0/24", "10.0.2.0/24"]
+  enable_dns_hostnames = true
 }
-
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.37.1"  # 最新版
+  version = "20.37.1"
 
-  cluster = {
-    name    = "my-eks-cluster"
-    version = "1.29"
-    endpoint_private_access = true
-    endpoint_public_access  = true
-  }
+  cluster_name    = "my-eks-cluster"
+  cluster_version = "1.29"
 
-  vpc_config = {
-    subnet_ids = module.vpc.public_subnets
-  }
+  endpoint_private_access = true
+  endpoint_public_access  = true
 
-  node_groups = {
+  vpc_id  = module.vpc.vpc_id
+  subnets = module.vpc.public_subnets
+
+  eks_managed_node_groups = {
     default = {
-      desired_capacity = 1
-      max_capacity     = 2
-      min_capacity     = 1
-      instance_types   = ["t3.medium"]
+      desired_size   = 1
+      max_size       = 2
+      min_size       = 1
+      instance_types = ["t3.medium"]
     }
   }
 }
+
 

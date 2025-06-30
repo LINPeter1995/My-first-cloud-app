@@ -1,5 +1,5 @@
 output "ecr_repo_url" {
-  value = aws_ecr_repository.app_repo.repository_url
+  value = aws_ecr_repository.my_app_repo.repository_url
 }
 
 output "rds_endpoint" {
@@ -7,9 +7,10 @@ output "rds_endpoint" {
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.app_bucket.bucket
+  value = aws_s3_bucket.static_assets.bucket
 }
 
 output "eks_cluster_name" {
   value = module.eks.cluster_name
 }
+
