@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🏗️ 部署開始..."
+echo "部署開始..."
 
 # 切換到 Terraform 專案目錄
 cd terraform
@@ -18,6 +18,6 @@ terraform plan
 # 套用 Terraform 建立資源
 terraform apply -auto-approve
 
-echo "✅ 部署完成"
+echo "部署完成"
 
 

@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    permissions:          # <--- 這裡必須有，且位置正確
+    permissions:
       id-token: write
       contents: read
 
@@ -23,12 +23,12 @@ jobs:
           role-to-assume: arn:aws:iam::129271359144:role/GitHubTerraformDeployRole
           aws-region: ap-northeast-1
 
-      - name: 🧰 Install Terraform
+      - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
 
-      - name: 🏗️ Run Terraform Deploy Script
+      - name: Run Terraform Deploy Script
         run: bash scripts/deploy.sh
 
 
