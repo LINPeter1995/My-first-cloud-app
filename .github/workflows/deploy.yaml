@@ -25,9 +25,11 @@ jobs:
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.3 # 或你專案需要的版本
+          terraform_version: 1.8.3
 
       - name: Deploy infrastructure
+        working-directory: terraform  # 指定 .tf 檔案所在的資料夾
         run: |
           terraform init
           terraform apply -auto-approve
+
