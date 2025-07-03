@@ -126,8 +126,23 @@ resource "aws_ecr_repository" "my_app_repo" {
   name = "my-app-repo"
 }
 
-resource "aws_s3_bucket" "static_assets" {
-  bucket        = "my-static-assets-${random_id.suffix.hex}"
-  force_destroy = true
+resource "random_id" "suffix" {
+  byte_length = 4
 }
 
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-static-assets-${random_id.suffix.hex}"
+  acl    = "private"
+}
+
+resource "aws_db_instance" "postgres" {
+  allocated_storage    = 20
+  engine               = "postgres"
+  engine_version       = "17"
+  instance_class       = "db.t3.micro"
+  db_name              = "your_db_name"
+  username             = "your_username"
+  password             = "your_password"
+  parameter_group_name = "default.postgres15"
+  skip_final_snapshot  = true
+}
