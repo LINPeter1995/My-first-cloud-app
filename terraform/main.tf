@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.44.0"  # 固定5.x的兼容版本
+      version = ">= 6.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -19,8 +19,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "ap-northeast-1"
-  version = "~> 5.44.0"
+  region = "ap-northeast-1"
 }
 
 resource "random_id" "suffix" {
@@ -36,7 +35,6 @@ resource "aws_s3_bucket" "static_assets" {
   force_destroy = true
 }
 
-# 讀取 RDS 密碼
 data "aws_secretsmanager_secret_version" "rds_secret" {
   secret_id = "My-first-cloud-app_RDS_Postgres"
 }
@@ -48,15 +46,14 @@ locals {
 resource "aws_db_instance" "postgres" {
   allocated_storage    = 20
   engine               = "postgres"
-  engine_version       = "17" 
+  engine_version       = "15.4"
   instance_class       = "db.t3.micro"
   db_name              = local.rds_secret.dbname
   username             = local.rds_secret.username
   password             = local.rds_secret.password
-  parameter_group_name = "default.postgres17"
+  parameter_group_name = "default.postgres15"
   skip_final_snapshot  = true
 }
-
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -90,7 +87,6 @@ module "eks" {
   }
 }
 
-# 取得 EKS 的連線資訊，供 Kubernetes Provider 使用
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_name
 }
@@ -105,7 +101,6 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
-# Kubernetes Deployment (Spring Boot app 範例)
 resource "kubernetes_deployment" "my_app" {
   metadata {
     name = "myapp"
@@ -160,4 +155,3 @@ resource "kubernetes_service" "my_app_service" {
     type = "LoadBalancer"
   }
 }
-
