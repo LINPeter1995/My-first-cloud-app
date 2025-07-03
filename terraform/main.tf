@@ -23,7 +23,7 @@ provider "aws" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.32.0" 
+  version = "~> 20.31"
 
   cluster_name                    = "my-eks-cluster"
   cluster_version                 = "1.29"
@@ -121,3 +121,13 @@ module "vpc" {
   public_subnets       = ["10.0.1.0/24", "10.0.2.0/24"]
   enable_dns_hostnames = true
 }
+
+resource "aws_ecr_repository" "my_app_repo" {
+  name = "my-app-repo"
+}
+
+resource "aws_s3_bucket" "static_assets" {
+  bucket        = "my-static-assets-${random_id.suffix.hex}"
+  force_destroy = true
+}
+
