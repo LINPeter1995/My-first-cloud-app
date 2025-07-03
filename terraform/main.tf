@@ -69,7 +69,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.32.0"
+  version = "19.21.0"  
 
   cluster_name                    = "my-eks-cluster"
   cluster_version                 = "1.29"
@@ -87,6 +87,7 @@ module "eks" {
     }
   }
 }
+
 
 # === 取得 EKS 的連線資訊，供 Kubernetes Provider 使用 ===
 
