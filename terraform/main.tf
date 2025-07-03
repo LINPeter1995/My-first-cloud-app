@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 6.0"
+      version = "~> 5.44.0"  # 固定5.x的兼容版本
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -19,7 +19,8 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-northeast-1"
+  region  = "ap-northeast-1"
+  version = "~> 5.44.0"
 }
 
 resource "random_id" "suffix" {
@@ -47,14 +48,15 @@ locals {
 resource "aws_db_instance" "postgres" {
   allocated_storage    = 20
   engine               = "postgres"
-  engine_version       = "15.4"
+  engine_version       = "17" 
   instance_class       = "db.t3.micro"
   db_name              = local.rds_secret.dbname
   username             = local.rds_secret.username
   password             = local.rds_secret.password
-  parameter_group_name = "default.postgres15"
+  parameter_group_name = "default.postgres17"
   skip_final_snapshot  = true
 }
+
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -69,7 +71,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.32.0" 
+  version = "20.18.0"
 
   cluster_name                    = "my-eks-cluster"
   cluster_version                 = "1.29"
@@ -88,9 +90,7 @@ module "eks" {
   }
 }
 
-
-# === 取得 EKS 的連線資訊，供 Kubernetes Provider 使用 ===
-
+# 取得 EKS 的連線資訊，供 Kubernetes Provider 使用
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_name
 }
@@ -105,8 +105,7 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
-# === Kubernetes 應用部署（Spring Boot app 範例）===
-
+# Kubernetes Deployment (Spring Boot app 範例)
 resource "kubernetes_deployment" "my_app" {
   metadata {
     name = "myapp"
@@ -161,3 +160,4 @@ resource "kubernetes_service" "my_app_service" {
     type = "LoadBalancer"
   }
 }
+
