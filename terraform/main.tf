@@ -2,7 +2,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.81.0"
+      version = ">= 6.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.26.0"
     }
   }
 
@@ -13,7 +17,6 @@ terraform {
     encrypt = true
   }
 }
-
 
 provider "aws" {
   region = "ap-northeast-1"
@@ -55,7 +58,7 @@ resource "aws_db_instance" "postgres" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.1.1"
+  version = "5.19.0"
 
   name                 = "my-vpc"
   cidr                 = "10.0.0.0/16"
@@ -82,5 +85,78 @@ module "eks" {
       instance_types = ["t3.medium"]
       subnet_ids     = module.vpc.public_subnets
     }
+  }
+}
+
+# === 取得 EKS 的連線資訊，供 Kubernetes Provider 使用 ===
+
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+
+# === Kubernetes 應用部署（Spring Boot app 範例）===
+
+resource "kubernetes_deployment" "my_app" {
+  metadata {
+    name = "myapp"
+    labels = {
+      app = "myapp"
+    }
+  }
+
+  spec {
+    replicas = 2
+
+    selector {
+      match_labels = {
+        app = "myapp"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "myapp"
+        }
+      }
+
+      spec {
+        container {
+          name  = "myapp"
+          image = "${aws_ecr_repository.my_app_repo.repository_url}:latest"
+          port {
+            container_port = 8080
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "my_app_service" {
+  metadata {
+    name = "myapp-service"
+  }
+
+  spec {
+    selector = {
+      app = kubernetes_deployment.my_app.metadata[0].labels.app
+    }
+
+    port {
+      port        = 80
+      target_port = 8080
+    }
+    type = "LoadBalancer"
   }
 }
