@@ -23,7 +23,7 @@ provider "aws" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.32.0"  # 最新版移除 elastic_gpu_specifications 等
+  version = "20.32.0" 
 
   cluster_name                    = "my-eks-cluster"
   cluster_version                 = "1.29"
@@ -109,4 +109,15 @@ resource "kubernetes_service" "my_app_service" {
     }
     type = "LoadBalancer"
   }
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.19.0"
+
+  name                 = "my-vpc"
+  cidr                 = "10.0.0.0/16"
+  azs                  = ["ap-northeast-1a", "ap-northeast-1c"]
+  public_subnets       = ["10.0.1.0/24", "10.0.2.0/24"]
+  enable_dns_hostnames = true
 }
