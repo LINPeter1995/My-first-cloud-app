@@ -7,7 +7,7 @@ output "rds_endpoint" {
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.static_assets.bucket
+  value = aws_s3_bucket.my_bucket.bucket
 }
 
 output "eks_cluster_name" {

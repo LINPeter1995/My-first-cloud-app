@@ -126,14 +126,29 @@ resource "aws_ecr_repository" "my_app_repo" {
   name = "my-app-repo"
 }
 
+# 產生隨機字串作為 S3 Bucket 名稱的一部分
 resource "random_id" "suffix" {
   byte_length = 4
 }
 
+# 建立 S3 Bucket，名稱包含隨機字串
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "my-static-assets-${random_id.suffix.hex}"
-  acl    = "private"
+  bucket        = "my-static-assets-${random_id.suffix.hex}"
+  force_destroy = true
+
+  tags = {
+    Name = "MyStaticAssets"
+  }
 }
+
+# 指定 Bucket 的 ACL 權限（private）
+resource "aws_s3_bucket_acl" "my_bucket_acl" {
+  bucket = aws_s3_bucket.my_bucket.id
+  acl    = "private"
+
+  depends_on = [aws_s3_bucket.my_bucket]
+}
+
 
 resource "aws_db_instance" "postgres" {
   allocated_storage    = 20
