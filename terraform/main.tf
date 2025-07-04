@@ -180,3 +180,4 @@ resource "kubernetes_service" "my_app_service" {
     type = "LoadBalancer"
   }
 }
+
