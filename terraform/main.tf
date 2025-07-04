@@ -2,11 +2,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "< 6.0"
+      version = "<= 6.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.26.0"
+      version = "<= 2.37.1"
     }
   }
   backend "s3" {
@@ -148,7 +148,6 @@ resource "aws_s3_bucket_acl" "my_bucket_acl" {
 
   depends_on = [aws_s3_bucket.my_bucket]
 }
-
 
 resource "aws_db_instance" "postgres" {
   allocated_storage    = 20
