@@ -44,18 +44,17 @@ jobs:
           name: terraform-debug-log
           path: terraform/terraform-debug.log
 
-      # ⬇️ 新增：安裝 kubectl
+      # 新增 kubectl 安裝與 EKS 連線設定
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
-      # ⬇️ 新增：更新 kubeconfig 以連線到 EKS
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region ap-northeast-1 --name your-eks-cluster-name
+          aws eks update-kubeconfig --region ap-northeast-1 --name my-eks-cluster
 
-      # ⬇️ 新增：部署 Kubernetes 資源，請將 your-k8s-folder 換成實際 K8s yaml 目錄（如 k8s/）
       - name: Deploy to EKS with kubectl
         run: |
           kubectl apply -f k8s/
+
