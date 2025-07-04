@@ -9,3 +9,4 @@ data:
       username: terraform
       groups:
         - system:masters
+

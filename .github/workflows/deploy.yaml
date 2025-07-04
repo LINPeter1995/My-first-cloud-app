@@ -54,9 +54,15 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ap-northeast-1 --name my-eks-cluster
 
-      - name: Deploy to EKS with kubectl
+      - name: Deploy aws-auth ConfigMap
         run: |
-          kubectl apply -f k8s/
+          kubectl apply -f k8s/aws-auth.yaml
+
+      - name: Validate kubectl access
+        run: |
+          kubectl get nodes
+
+
 
 
 
