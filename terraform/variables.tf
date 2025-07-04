@@ -10,3 +10,9 @@ variable "region" {
 #   type        = string
 #   sensitive   = true
 # }
+
+variable "subnet_ids" {
+  description = "List of subnet IDs where EKS cluster control plane (ENIs) will be provisioned"
+  type        = list(string)
+  default     = []
+}
