@@ -22,4 +22,8 @@ output "eks_oidc_provider" {
   value = module.eks.oidc_provider
 }
 
+output "public_subnets" {
+  value = module.vpc.public_subnets
+}
+
 

@@ -51,6 +51,7 @@ module "eks" {
 
   cluster_endpoint_public_access = true
   subnet_ids = module.vpc.public_subnets
+  
 
   manage_aws_auth_configmap = true
 
