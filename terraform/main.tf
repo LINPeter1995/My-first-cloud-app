@@ -21,6 +21,8 @@ provider "aws" {
   region = "ap-northeast-1"
 }
 
+data "aws_caller_identity" "current" {}
+
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "20.37.1"
@@ -32,6 +34,8 @@ module "eks" {
   cluster_endpoint_public_access = true
   subnet_ids = module.vpc.public_subnets
 
+  manage_aws_auth_configmap = true
+
   eks_managed_node_groups = {
     default = {
       desired_size   = 1
@@ -41,7 +45,24 @@ module "eks" {
       subnet_ids     = module.vpc.public_subnets
     }
   }
+
+  aws_auth_roles = [
+    {
+      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.eks_managed_node_groups["default"].iam_role_name}"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups   = ["system:bootstrappers", "system:nodes"]
+    }
+  ]
+
+  aws_auth_users = [
+    {
+      userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${var.iam_user}"
+      username = var.iam_user
+      groups   = ["system:masters"]
+    }
+  ]
 }
+
 
 resource "kubernetes_deployment" "my_app" {
   depends_on = [module.eks]
