@@ -29,7 +29,17 @@ jobs:
 
       - name: Deploy infrastructure
         working-directory: terraform  # 指定 .tf 檔案所在的資料夾
+        env:
+          TF_LOG: DEBUG                           # 開啟 debug log
+          TF_LOG_PATH: terraform-debug.log       # 將 log 輸出為檔案
         run: |
           terraform init
           terraform apply -auto-approve
+
+      - name: Upload Terraform debug log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-debug-log
+          path: terraform/terraform-debug.log
 
