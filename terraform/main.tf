@@ -171,6 +171,7 @@ module "aws_auth" {
   version = "20.37.1"
 
   cluster_name = module.eks.cluster_name
+
   map_roles = [
     {
       rolearn  = "arn:aws:iam::129271359144:role/GitHubTerraformDeployRole"
@@ -179,3 +180,4 @@ module "aws_auth" {
     }
   ]
 }
+
