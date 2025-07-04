@@ -43,26 +43,39 @@ module "eks" {
       min_size       = 1
       instance_types = ["t3.medium"]
       subnet_ids     = module.vpc.public_subnets
-      iam_role_name  = "default-eks-node-group-role"  # 你可自行指定角色名稱或使用預設
     }
   }
 
   aws_auth_roles = [
     {
-      # 直接寫 node group 角色 ARN，或者輸入變數傳入較安全
-      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/default-eks-node-group-role"
+      rolearn  = "arn:aws:iam::129271359144:role/GitHubTerraformDeployRole"
+      username = "github-actions"
+      groups   = ["system:masters"]
+    },
+    {
+      rolearn  = module.eks.eks_managed_node_groups["default"].iam_role_arn
       username = "system:node:{{EC2PrivateDNSName}}"
       groups   = ["system:bootstrappers", "system:nodes"]
     }
   ]
+}
 
-  aws_auth_users = [
-    {
-      userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${var.iam_user}"
-      username = var.iam_user
-      groups   = ["system:masters"]
-    }
-  ]
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+
+resource "aws_ecr_repository" "my_app_repo" {
+  name = "my-app-repo"
 }
 
 resource "kubernetes_deployment" "my_app" {
@@ -121,6 +134,7 @@ resource "kubernetes_service" "my_app_service" {
     type = "LoadBalancer"
   }
 }
+
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"

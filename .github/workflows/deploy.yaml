@@ -35,7 +35,7 @@ jobs:
           TF_LOG_PATH: terraform-debug.log
         run: |
           terraform init
-          terraform apply -auto-approve
+          terraform apply -auto-approve -var="iam_user=GitHubTerraformDeployRole"
 
       - name: Upload Terraform debug log
         if: failure()
