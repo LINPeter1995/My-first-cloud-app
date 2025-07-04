@@ -23,16 +23,13 @@ provider "aws" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.31"
+  version = "20.37.1"
 
-  cluster_name                    = "my-eks-cluster"
-  cluster_version                 = "1.29"
-  cluster_endpoint_private_access = true
-  cluster_endpoint_public_access  = true
+  cluster_name    = "my-eks-cluster"
+  cluster_version = "1.29"
+  vpc_id          = module.vpc.vpc_id
 
-  vpc_id      = module.vpc.vpc_id
-
-  subnet_ids  = module.vpc.private_subnets
+  subnet_ids = module.vpc.public_subnets
 
   eks_managed_node_groups = {
     default = {
@@ -40,9 +37,6 @@ module "eks" {
       max_size       = 2
       min_size       = 1
       instance_types = ["t3.medium"]
-
-      # Worker nodes 也可以放在 public_subnets（測試用），或 private_subnets（生產環境）
-
       subnet_ids     = module.vpc.public_subnets
     }
   }
@@ -129,8 +123,8 @@ module "vpc" {
   azs             = ["ap-northeast-1a", "ap-northeast-1c"]
   public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  enable_nat_gateway = false
+  private_subnets = []
   enable_dns_hostnames = true
   enable_dns_support   = true
 
