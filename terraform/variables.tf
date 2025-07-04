@@ -10,7 +10,7 @@ variable "subnet_ids" {
 }
 
 variable "iam_user" {
-  description = "IAM user to grant EKS access to"
+  description = "I AM user name to be granted admin access to the EKS cluster"
   type        = string
 }
 

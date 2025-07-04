@@ -43,12 +43,14 @@ module "eks" {
       min_size       = 1
       instance_types = ["t3.medium"]
       subnet_ids     = module.vpc.public_subnets
+      iam_role_name  = "default-eks-node-group-role"  # 你可自行指定角色名稱或使用預設
     }
   }
 
   aws_auth_roles = [
     {
-      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.eks_managed_node_groups["default"].iam_role_name}"
+      # 直接寫 node group 角色 ARN，或者輸入變數傳入較安全
+      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/default-eks-node-group-role"
       username = "system:node:{{EC2PrivateDNSName}}"
       groups   = ["system:bootstrappers", "system:nodes"]
     }
@@ -62,7 +64,6 @@ module "eks" {
     }
   ]
 }
-
 
 resource "kubernetes_deployment" "my_app" {
   depends_on = [module.eks]
