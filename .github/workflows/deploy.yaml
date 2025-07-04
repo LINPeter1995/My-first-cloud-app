@@ -43,3 +43,7 @@ jobs:
           name: terraform-debug-log
           path: terraform/terraform-debug.log
 
+      # - name: Destroy infrastructure
+      #   working-directory: terraform
+      #   run: terraform destroy -auto-approve
+

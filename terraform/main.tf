@@ -29,6 +29,7 @@ module "eks" {
   cluster_version = "1.29"
   vpc_id          = module.vpc.vpc_id
 
+  cluster_endpoint_public_access = true
   subnet_ids = module.vpc.public_subnets
 
   eks_managed_node_groups = {
@@ -59,6 +60,8 @@ provider "kubernetes" {
 }
 
 resource "kubernetes_deployment" "my_app" {
+  depends_on = [module.eks]
+
   metadata {
     name = "myapp"
     labels = {
