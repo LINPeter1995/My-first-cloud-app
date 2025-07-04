@@ -32,7 +32,6 @@ module "eks" {
 
   vpc_id      = module.vpc.vpc_id
 
-  # 新增這一行：提供控制平面需要的 subnet（建議用 private_subnets）
   subnet_ids  = module.vpc.private_subnets
 
   eks_managed_node_groups = {
@@ -49,7 +48,6 @@ module "eks" {
   }
 }
 
-
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_name
   depends_on = [module.eks]  # 確保先建立 Cluster
@@ -65,8 +63,6 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
-
-
 
 resource "kubernetes_deployment" "my_app" {
   metadata {
@@ -140,17 +136,14 @@ module "vpc" {
   enable_dns_support   = true
 }
 
-
 resource "aws_ecr_repository" "my_app_repo" {
   name = "my-app-repo"
 }
 
-# 產生隨機字串作為 S3 Bucket 名稱的一部分
 resource "random_id" "suffix" {
   byte_length = 4
 }
 
-# 建立 S3 Bucket，名稱包含隨機字串
 resource "aws_s3_bucket" "my_bucket" {
   bucket        = "my-static-assets-${random_id.suffix.hex}"
   force_destroy = true
@@ -160,22 +153,72 @@ resource "aws_s3_bucket" "my_bucket" {
   }
 }
 
-# 指定 Bucket 的 ACL 權限（private）
-resource "aws_s3_bucket_acl" "my_bucket_acl" {
-  bucket = aws_s3_bucket.my_bucket.id
-  acl    = "private"
-
-  depends_on = [aws_s3_bucket.my_bucket]
-}
-
 resource "aws_db_instance" "postgres" {
   allocated_storage    = 20
   engine               = "postgres"
-  engine_version       = "17"
+  engine_version       = "15"
   instance_class       = "db.t3.micro"
   db_name              = "your_db_name"
   username             = "your_username"
   password             = "your_password"
   parameter_group_name = "default.postgres15"
   skip_final_snapshot  = true
+}
+
+resource "aws_subnet" "public_subnet_1" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "ap-northeast-1a"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet-1"
+  }
+}
+
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "main-vpc"
+  }
+}
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "main-igw"
+  }
+}
+
+resource "aws_subnet" "public_subnet_1" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "ap-northeast-1a"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet-1"
+  }
+}
+
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+
+  tags = {
+    Name = "public-route-table"
+  }
+}
+
+resource "aws_route_table_association" "public_rt_assoc" {
+  subnet_id      = aws_subnet.public_subnet_1.id
+  route_table_id = aws_route_table.public_rt.id
 }
