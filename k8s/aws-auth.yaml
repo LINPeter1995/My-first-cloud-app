@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::129271359144:role/GitHubTerraformDeployRole
+      username: terraform
+      groups:
+        - system:masters
