@@ -52,17 +52,23 @@ module "eks" {
 
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_name
+  depends_on = [module.eks]  # 確保先建立 EKS Cluster
 }
 
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
+  depends_on = [module.eks]
 }
 
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.cluster.token
+
+  # 明確告訴 provider 等待 cluster 建立完
+  depends_on = [module.eks]
 }
+
 
 resource "kubernetes_deployment" "my_app" {
   metadata {
