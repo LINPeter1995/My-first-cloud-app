@@ -61,6 +61,7 @@ module "eks" {
       subnet_ids     = module.vpc.public_subnets
     }
   }
+}
 
 module "aws_auth" {
   source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
@@ -90,7 +91,6 @@ module "aws_auth" {
   aws_auth_accounts = [
     "129271359144"
   ]
-}
 
 data "aws_eks_cluster" "cluster" {
   name       = module.eks.cluster_name
