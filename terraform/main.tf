@@ -74,7 +74,7 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path = "C:/Users/User/.kube/config"
 }
 
 resource "aws_ecr_repository" "my_app_repo" {
