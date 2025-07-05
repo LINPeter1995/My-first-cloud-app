@@ -28,7 +28,7 @@ jobs:
         with:
           terraform_version: 1.8.3
 
-      - name: Deploy infrastructure
+      - name: Deploy infrastructure with Terraform
         working-directory: terraform
         env:
           TF_LOG: DEBUG
@@ -37,28 +37,29 @@ jobs:
           terraform init
           terraform apply -auto-approve -var="iam_role=GitHubTerraformDeployRole"
 
-      - name: Upload Terraform debug log
+      - name: Upload Terraform debug log on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: terraform-debug-log
           path: terraform/terraform-debug.log
 
-      # 新增 kubectl 安裝與 EKS 連線設定
-      - name: Setup kubectl
+      - name: Install kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
-      - name: Update kubeconfig
+      - name: Update kubeconfig for EKS
         run: |
-          aws eks update-kubeconfig --region ap-northeast-1 --name my-eks-cluster
+          aws eks update-kubeconfig \
+            --region ap-northeast-1 \
+            --name my-eks-cluster
 
-      - name: Deploy aws-auth ConfigMap
+      - name: Apply aws-auth ConfigMap
         run: |
           kubectl apply -f k8s/aws-auth.yaml
 
-      - name: Validate kubectl access
+      - name: Validate kubectl connection
         run: |
           kubectl get nodes
 
