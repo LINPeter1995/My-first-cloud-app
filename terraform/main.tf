@@ -51,7 +51,9 @@ module "eks" {
 
   cluster_endpoint_public_access = true
   subnet_ids = module.vpc.public_subnets
-  
+
+  enable_cluster_creator_admin_permissions = true
+
   eks_managed_node_groups = {
     default = {
       desired_size   = 1
@@ -61,21 +63,15 @@ module "eks" {
       subnet_ids     = module.vpc.public_subnets
     }
   }
-  enable_cluster_creator_admin_permissions = true
-}
 
-module "aws_auth" {
-  source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
-  version = "~> 20.0"
-
-  cluster_name = module.eks.cluster_id
+  manage_aws_auth_configmap = true
 
   aws_auth_roles = [
     {
       rolearn  = "arn:aws:iam::123456789012:role/role1"
       username = "role1"
       groups   = ["system:masters"]
-    },
+    }
   ]
 
   aws_auth_users = [
@@ -85,7 +81,10 @@ module "aws_auth" {
       groups   = ["system:masters"]
     }
   ]
+
+  aws_auth_accounts = ["123456789012"]
 }
+
 
 
 data "aws_eks_cluster" "cluster" {
