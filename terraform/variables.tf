@@ -4,11 +4,6 @@ variable "region" {
   default     = "ap-northeast-1"
 }
 
-variable "iam_user" {
-  description = "I AM user name to be granted admin access to the EKS cluster"
-  type        = string
-}
-
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
