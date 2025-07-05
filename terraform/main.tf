@@ -61,6 +61,7 @@ module "eks" {
       subnet_ids     = module.vpc.public_subnets
     }
   }
+  enable_cluster_creator_admin_permissions = true
 }
 
 module "aws_auth" {
@@ -84,13 +85,8 @@ module "aws_auth" {
       groups   = ["system:masters"]
     }
   ]
-
-  aws_auth_accounts = ["123456789012"]
 }
 
-  aws_auth_accounts = [
-    "129271359144"
-  ]
 
 data "aws_eks_cluster" "cluster" {
   name       = module.eks.cluster_name
