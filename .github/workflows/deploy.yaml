@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:   # 加上手動觸發事件，才能手動執行 destroy
 
 permissions:
   id-token: write
@@ -63,27 +62,30 @@ jobs:
         run: |
           kubectl get nodes
 
-  destroy:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # destroy:
+  #   runs-on: ubuntu-latest
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::129271359144:role/GitHubTerraformDeployRole
-          aws-region: ap-northeast-1
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
 
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.8.3
+  #   - name: Configure AWS credentials
+  #     uses: aws-actions/configure-aws-credentials@v4
+  #     with:
+  #       role-to-assume: arn:aws:iam::129271359144:role/GitHubTerraformDeployRole
+  #       aws-region: ap-northeast-1
 
-      # - name: Destroy infrastructure
-      #   working-directory: terraform
-      #   run: terraform destroy -auto-approve
+  #   - name: Install Terraform
+  #     uses: hashicorp/setup-terraform@v3
+  #     with:
+  #       terraform_version: 1.8.3
+
+  #   - name: Terraform Init
+  #     run: terraform init
+
+  #   - name: Terraform Destroy
+  #     run: terraform destroy -auto-approve
+
      
 
 
