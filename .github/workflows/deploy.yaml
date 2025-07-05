@@ -30,13 +30,13 @@ jobs:
           terraform_version: 1.8.3
 
       - name: Deploy infrastructure
-        working-directory: terraform  # 指定 .tf 檔案所在的資料夾
+        working-directory: terraform
         env:
           TF_LOG: DEBUG
           TF_LOG_PATH: terraform-debug.log
         run: |
           terraform init
-          terraform apply -auto-approve -var="iam_user=GitHubTerraformDeployRole"
+          terraform apply -auto-approve -var="iam_role=GitHubTerraformDeployRole"
 
       - name: Upload Terraform debug log
         if: failure()
@@ -65,8 +65,7 @@ jobs:
 
   destroy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'  # 只在手動觸發時執行 destroy
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
