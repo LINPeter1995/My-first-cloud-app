@@ -6,6 +6,12 @@ metadata:
 data:
   mapUsers: |
     - userarn: arn:aws:iam::129271359144:user/TerraformUser
-      username: TerraformUser
-      groups:
-        - system:masters
+     username: terraform-user
+     groups:
+       - system:masters
+
+mapRoles: |
+  - rolearn: arn:aws:iam::129271359144:role/GitHubActionsRole
+   username: github-actions
+   groups:
+     - system:masters
