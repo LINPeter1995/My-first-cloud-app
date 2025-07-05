@@ -62,11 +62,15 @@ module "eks" {
     }
   }
 
-  manage_aws_auth_configmap = true
+module "aws_auth" {
+  source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
+  version = "~> 20.0"
+
+  cluster_name = module.eks.cluster_id
 
   aws_auth_roles = [
     {
-      rolearn  = "arn:aws:iam::129271359144:role/role1"
+      rolearn  = "arn:aws:iam::123456789012:role/role1"
       username = "role1"
       groups   = ["system:masters"]
     },
@@ -74,16 +78,14 @@ module "eks" {
 
   aws_auth_users = [
     {
-      userarn  = "arn:aws:iam::129271359144:user/user1"
+      userarn  = "arn:aws:iam::123456789012:user/user1"
       username = "user1"
       groups   = ["system:masters"]
-    },
-    {
-      userarn  = "arn:aws:iam::129271359144:user/user2"
-      username = "user2"
-      groups   = ["system:masters"]
-    },
+    }
   ]
+
+  aws_auth_accounts = ["123456789012"]
+}
 
   aws_auth_accounts = [
     "129271359144"
