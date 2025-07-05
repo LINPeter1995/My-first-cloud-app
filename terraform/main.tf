@@ -165,3 +165,19 @@ resource "kubernetes_service" "my_app_service" {
   }
 }
 
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapUsers = yamlencode([
+      {
+        userarn  = "arn:aws:iam::123456789012:user/TerraformUser"
+        username = "TerraformUser"
+        groups   = ["system:masters"]
+      }
+    ])
+  }
+}
