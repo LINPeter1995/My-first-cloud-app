@@ -52,7 +52,15 @@ module "eks" {
   cluster_endpoint_public_access = true
   subnet_ids = module.vpc.public_subnets
 
-  enable_cluster_creator_admin_permissions = true
+  manage_aws_auth_configmap = true
+
+  aws_auth_roles = [
+    {
+      rolearn  = "arn:aws:iam::129271359144:role/GitHubTerraformDeployRole"
+      username = "github"
+      groups   = ["system:masters"]
+    }
+  ]
 
   eks_managed_node_groups = {
     default = {
@@ -63,28 +71,7 @@ module "eks" {
       subnet_ids     = module.vpc.public_subnets
     }
   }
-
-  manage_aws_auth_configmap = true
-
-  aws_auth_roles = [
-    {
-      rolearn  = "arn:aws:iam::123456789012:role/role1"
-      username = "role1"
-      groups   = ["system:masters"]
-    }
-  ]
-
-  aws_auth_users = [
-    {
-      userarn  = "arn:aws:iam::123456789012:user/user1"
-      username = "user1"
-      groups   = ["system:masters"]
-    }
-  ]
-
-  aws_auth_accounts = ["123456789012"]
 }
-
 
 
 data "aws_eks_cluster" "cluster" {
