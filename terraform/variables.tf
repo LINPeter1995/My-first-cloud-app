@@ -16,3 +16,7 @@ variable "cluster_version" {
   default     = "1.29"
 }
 
+variable "iam_role" {
+  description = "IAM role name to be granted admin access to the EKS cluster"
+  type        = string
+}
