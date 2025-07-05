@@ -82,10 +82,10 @@ jobs:
         with:
           terraform_version: 1.8.3
 
-      - name: Destroy infrastructure
-        working-directory: terraform
-        run: terraform destroy -auto-approve
-
+      # - name: Destroy infrastructure
+      #   working-directory: terraform
+      #   run: terraform destroy -auto-approve
+     
 
 
 

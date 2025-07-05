@@ -62,6 +62,32 @@ module "eks" {
     }
   }
 
+  manage_aws_auth_configmap = true
+
+  aws_auth_roles = [
+    {
+      rolearn  = "arn:aws:iam::129271359144:role/role1"
+      username = "role1"
+      groups   = ["system:masters"]
+    },
+  ]
+
+  aws_auth_users = [
+    {
+      userarn  = "arn:aws:iam::129271359144:user/user1"
+      username = "user1"
+      groups   = ["system:masters"]
+    },
+    {
+      userarn  = "arn:aws:iam::129271359144:user/user2"
+      username = "user2"
+      groups   = ["system:masters"]
+    },
+  ]
+
+  aws_auth_accounts = [
+    "129271359144"
+  ]
 }
 
 data "aws_eks_cluster" "cluster" {
@@ -164,20 +190,5 @@ resource "kubernetes_service" "my_app_service" {
     }
     type = "LoadBalancer"
   }
-}
-
-module "aws_auth" {
-  source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
-  version = "20.37.1"
-
-  cluster_name = module.eks.cluster_name
-
-  map_roles = [
-    {
-      rolearn  = "arn:aws:iam::129271359144:role/GitHubTerraformDeployRole"
-      username = "github-actions"
-      groups   = ["system:masters"]
-    }
-  ]
 }
 
